@@ -1,0 +1,365 @@
+<!DOCTYPE html> 
+<html> 
+<head> <title>Media multicasting</title> 
+<meta charset="UTF-8" /> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)" /> 
+<link rel="stylesheet" type="text/css" href="index.css" /> 
+<script type="text/javascript" 
+src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" 
+></script> 
+<style type="text/css"> 
+.MathJax_MathML {text-indent: 0;} 
+</style> 
+</head><body 
+>
+   <div class="maketitle">
+                                                                  
+
+                                                                  
+                                                                  
+
+                                                                  
+
+<h2 class="titleHead">Media multicasting</h2>
+ <div class="author" ><span 
+class="ecrm-1200">Vicente Gonz</span><span 
+class="ecrm-1200">á</span><span 
+class="ecrm-1200">lez Ruiz</span></div><br />
+<div class="date" ><span 
+class="ecrm-1200">May 30, 2018</span></div>
+   </div>
+   <h3 class="likesectionHead"><a 
+ id="x1-1000"></a>Contents</h3>
+   <div class="tableofcontents">
+   <span class="sectionToc" >1 <a 
+href="#x1-20001" id="QQ2-1-2">Where are the video and audio devices?</a></span>
+<br />   <span class="sectionToc" >2 <a 
+href="#x1-30002" id="QQ2-1-3">VLC</a></span>
+<br />   <span class="sectionToc" >3 <a 
+href="#x1-40003" id="QQ2-1-4">FFMPEG</a></span>
+<br />    <span class="subsectionToc" >3.1 <a 
+href="#x1-50003.1" id="QQ2-1-5">Listing formats</a></span>
+<br />    <span class="subsectionToc" >3.2 <a 
+href="#x1-60003.2" id="QQ2-1-6">Listing codecs</a></span>
+<br />    <span class="subsectionToc" >3.3 <a 
+href="#x1-70003.3" id="QQ2-1-7">Only visualizing</a></span>
+<br />    <span class="subsectionToc" >3.4 <a 
+href="#x1-80003.4" id="QQ2-1-8">Capturing</a></span>
+<br />    <span class="subsectionToc" >3.5 <a 
+href="#x1-90003.5" id="QQ2-1-9">Multiple unicast streaming</a></span>
+<br />    <span class="subsectionToc" >3.6 <a 
+href="#x1-100003.6" id="QQ2-1-10">Multicast streaming</a></span>
+   </div>
+<!--l. 6--><p class="indent" >   Let&#x2019;s see some multicasing examples using VLC and FFMPEG.
+</p><!--l. 8--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
+ id="x1-20001"></a>Where are the video and audio devices?</h3>
+<!--l. 9--><p class="noindent" >The ﬁrst input video device is <span 
+class="ectt-1000">/dev/video0</span>, the second one <span 
+class="ectt-1000">/dev/video1 </span>and so
+on.
+</p><!--l. 12--><p class="indent" >   Under ALSA there is not devices that you can see in the ﬁlesystem. To known
+which are the input audio devices, you can write:
+                                                                  
+
+                                                                  
+</p>
+   <div class="verbatim" id="verbatim-1">
+arecord -l
+</div>
+<!--l. 16--><p class="nopar" > The output could be something like:
+                                                                  
+
+                                                                  
+</p>
+   <div class="verbatim" id="verbatim-2">
+**** List of CAPTURE Hardware Devices ****
+ <br />card 0: NVidia [HDA NVidia], device 0: ALC889A Analog [ALC889A Analog]
+ <br />  Subdevices: 1/1
+ <br />  Subdevice #0: subdevice #0
+ <br />card 0: NVidia [HDA NVidia], device 1: ALC889A Digital [ALC889A Digital]
+ <br />  Subdevices: 1/1
+ <br />  Subdevice #0: subdevice #0
+ <br />card 0: NVidia [HDA NVidia], device 2: ALC889A Analog [ALC889A Analog]
+ <br />  Subdevices: 2/2
+ <br />  Subdevice #0: subdevice #0
+ <br />  Subdevice #1: subdevice #1
+ <br />card 1: default [Camera         ], device 0: USB Audio [USB Audio]
+ <br />  Subdevices: 1/1
+ <br />  Subdevice #0: subdevice #0
+</div>
+<!--l. 33--><p class="nopar" >
+</p><!--l. 35--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+ id="x1-30002"></a>VLC</h3>
+<!--l. 37--><p class="noindent" >Go to:
+     </p><ol  class="enumerate1" >
+     <li 
+  class="enumerate" id="x1-3002x1">Go to <span 
+class="ectt-1000">Media</span>.
+     </li>
+     <li 
+  class="enumerate" id="x1-3004x2">Select <span 
+class="ectt-1000">Streaming...</span>.
+     </li>
+     <li 
+  class="enumerate" id="x1-3006x3">Select <span 
+class="ectt-1000">Capture Device</span>.
+     </li>
+     <li 
+  class="enumerate" id="x1-3008x4">Select <span 
+class="ectt-1000">Video for Linux 2</span>.
+     </li>
+     <li 
+  class="enumerate" id="x1-3010x5">The video device name is <span 
+class="ectt-1000">/dev/video0 </span>if you have only one camera attached to
+     your computer. If you have more than one, try
+                                                                  
+
+                                                                  
+     <div class="verbatim" id="verbatim-3">
+     ffplay -f video4linux2 /dev/video0
+</div>
+     <!--l. 47--><p class="nopar" > to test if the device is whose that you want to use. The audio device name is
+     <span 
+class="ectt-1000">plughw:default</span>.
+     </p></li>
+     <li 
+  class="enumerate" id="x1-3012x6">Push on <span 
+class="ectt-1000">Stream</span>.
+     </li>
+     <li 
+  class="enumerate" id="x1-3014x7">Now, VLC conﬁrm your video source, that should be <span 
+class="ectt-1000">v4l2:///dev/video0</span>.
+     Pusn on <span 
+class="ectt-1000">Next</span>.
+     </li>
+     <li 
+  class="enumerate" id="x1-3016x8">Enable <span 
+class="ectt-1000">Display locally </span>if you want to see your emision.
+     </li>
+     <li 
+  class="enumerate" id="x1-3018x9">Chose <span 
+class="ectt-1000">RTP / MPEG Transport Stream </span>instead of <span 
+class="ectt-1000">File</span>. Next. push
+     <span 
+class="ectt-1000">Add</span>.
+     </li>
+     <li 
+  class="enumerate" id="x1-3020x10">In the <span 
+class="ectt-1000">RTP/TS </span>section, write a multicast address (<span 
+class="ectt-1000">224.0.0.1 </span>for example;
+     remember that the multicast address range is from <span 
+class="ectt-1000">224.0.0.1 </span>to
+     <span 
+class="ectt-1000">239.255.255.255</span>). Select also a port (an integer between 1024 an
+     65335).
+     </li>
+     <li 
+  class="enumerate" id="x1-3022x11">Transcoding should be activated (<span 
+class="ectt-1000">Video - H.264 + AAC (MP4)</span>).
+     </li>
+     <li 
+  class="enumerate" id="x1-3024x12">Push on <span 
+class="ectt-1000">Stream</span>.</li></ol>
+<!--l. 66--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+ id="x1-40003"></a>FFMPEG</h3>
+<!--l. 68--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.1   </span> <a 
+ id="x1-50003.1"></a>Listing formats</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-4">
+ffmpeg -formats
+</div>
+<!--l. 71--><p class="nopar" >
+</p><!--l. 73--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.2   </span> <a 
+ id="x1-60003.2"></a>Listing codecs</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-5">
+ffmpeg -codecs
+</div>
+<!--l. 76--><p class="nopar" >
+</p><!--l. 78--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.3   </span> <a 
+ id="x1-70003.3"></a>Only visualizing</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-6">
+ffplay -f video4linux2 /dev/video0
+ <br />ffplay -s 320x240 -f video4linux2 /dev/video0
+ <br />ffplay -s 640x480 -f video4linux2 /d-vcodec mpeg4 -f alsa -ac 2 -i pulse -acodec mp2 rtp://224.0.1.2:1234
+ <br />ev/video0
+</div>
+<!--l. 84--><p class="nopar" >
+</p><!--l. 86--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.4   </span> <a 
+ id="x1-80003.4"></a>Capturing</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-7">
+# Capturing time: 10 seconds
+ <br /># Frame rate: 30 frames/second
+ <br /># Container: OGG
+ <br />ffmpeg -t 10 -f video4linux2 -s 320x240 -r 30 -i /dev/video0 -f ogg /tmp/1.ogg
+ <br />
+ <br />ffmpeg -y -t 10 -f video4linux2 -s 320x240 -r 30 -i /dev/video0 -f ogg
+ <br />-f alsa -ac 2 -i hw:0,0 -acodec libvorbis /tmp/1.ogg
+ <br />
+ <br />ffmpeg -y -t 10 -f video4linux2 -s 320x240 -r 30 -i /dev/video0 -f
+ <br />x264 -f alsa -ac 2 -i pulse -acodec mp2 /tmp/1.mp4
+ <br />
+ <br />ffmpeg -y -t 10 -f video4linux2 -s 320x240 -r 30 -i /dev/video0 -f mp4 -vcodec mpeg4 -b 350k /tmp/1.mp4
+ <br />
+ <br />ffmpeg -r 15 -s 352x288 -f video4linux2 -i /dev/video0 -f mpegts
+ <br />-vcodec mpeg4 udp://224.0.1.2:1234
+ <br />mplayer udp://224.0.1.2:1234
+ <br />
+ <br />ffmpeg -r 15 -s 352x288 -f video4linux2 -i /dev/video0 -f mpegts
+ <br />-vcodec mpeg4 rtp://224.0.1.2:1234
+ <br />ffplay rtp://224.0.1.2:1234
+ <br />
+ <br />
+</div>
+<!--l. 110--><p class="nopar" >
+</p><!--l. 112--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.5   </span> <a 
+ id="x1-90003.5"></a>Multiple unicast streaming</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-8">
+cat &#x003E; ffserver.conf &#x003C;&#x003C; EOF
+ <br />Port 8090
+ <br /># bind to all IPs aliased or not
+ <br />BindAddress 0.0.0.0
+ <br /># max number of simultaneous clients
+ <br />MaxClients 1000
+ <br /># max bandwidth per-client (kb/s)
+ <br />MaxBandwidth 10000
+ <br /># Suppress that if you want to launch ffserver as a daemon.
+ <br />NoDaemon
+ <br />
+ <br />&#x003C;Feed feed1.ffm&#x003E;
+ <br />File /tmp/feed1.ffm
+ <br />FileMaxSize 5M
+ <br />&#x003C;/Feed&#x003E;
+ <br />
+ <br /># FLV output - good for streaming
+ <br />&#x003C;Stream test.flv&#x003E;
+ <br /># the source feed
+ <br />Feed feed1.ffm
+ <br /># the output stream format - FLV = FLash Video
+ <br />Format flv
+ <br />VideoCodec flv
+ <br /># this must match the ffmpeg -r argument
+ <br />VideoFrameRate 15
+ <br /># generally leave this is a large number
+ <br />VideoBufferSize 80000
+ <br /># another quality tweak
+ <br />VideoBitRate 200
+ <br /># quality ranges - 1-31 (1 = best, 31 = worst)
+ <br />VideoQMin 1
+ <br />VideoQMax 5
+ <br />VideoSize 352x288
+ <br /># this sets how many seconds in past to start
+ <br />PreRoll 0
+ <br /># wecams don&#x2019;t have audio
+ <br />Noaudio
+ <br />&#x003C;/Stream&#x003E;
+ <br />
+ <br /># ASF output - for windows media player
+ <br />&#x003C;Stream test.asf&#x003E;
+ <br /># the source feed
+                                                                  
+
+                                                                  
+ <br />Feed feed1.ffm
+ <br /># the output stream format - ASF
+ <br />Format asf
+ <br />VideoCodec msmpeg4
+ <br /># this must match the ffmpeg -r argument
+ <br />VideoFrameRate 15
+ <br /># generally leave this is a large number
+ <br />VideoBufferSize 80000
+ <br /># another quality tweak
+ <br />VideoBitRate 200
+ <br /># quality ranges - 1-31 (1 = best, 31 = worst)
+ <br />VideoQMin 1
+ <br />VideoQMax 5
+ <br />VideoSize 352x288
+ <br /># this sets how many seconds in past to start
+ <br />PreRoll 0
+ <br /># wecams don&#x2019;t have audio
+ <br />Noaudio
+ <br />&#x003C;/Stream&#x003E;
+ <br />
+ <br />##################################################################
+ <br /># SDP/multicast examples
+ <br />#
+ <br /># If you want to send your stream in multicast, you must set the
+ <br /># multicast address with MulticastAddress. The port and the TTL can
+ <br /># also be set.
+ <br />#
+ <br /># An SDP file is automatically generated by ffserver by adding the
+ <br /># &#x2019;sdp&#x2019; extension to the stream name (here
+ <br /># http://localhost:8090/test1-sdp.sdp). You should usually give this
+ <br /># file to your player to play the stream.
+ <br />#
+ <br /># The &#x2019;NoLoop&#x2019; option can be used to avoid looping when the stream is
+ <br /># terminated.
+ <br />&#x003C;Stream test1-sdp.mpg&#x003E;
+ <br />Format rtp
+ <br />Feed feed1.ffm
+ <br />#File &#x0022;/usr/local/httpd/htdocs/test1.mpg&#x0022;
+ <br />MulticastAddress 224.124.0.1
+ <br />MulticastPort 5000
+ <br />MulticastTTL 16
+ <br />NoLoop
+ <br />&#x003C;/Stream&#x003E;
+ <br />EOF
+ <br />
+ <br />ffserver -d ./ffserver.conf
+                                                                  
+
+                                                                  
+ <br />
+ <br />ffmpeg -r 15 -s 352x288 -f video4linux2 -i /dev/video0 http://localhost:8090/feed1.ffm
+ <br />
+ <br />mplayer http://localhost:8090/test.asf
+</div>
+<!--l. 206--><p class="nopar" >
+</p><!--l. 208--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.6   </span> <a 
+ id="x1-100003.6"></a>Multicast streaming</h4>
+                                                                  
+
+                                                                  
+   <div class="verbatim" id="verbatim-9">
+ffmpeg -r 15 -s 352x288 -f video4linux2 -i /dev/video0 -f mpegts -vcodec mpeg4 -f alsa -ac 2 -i pulse -acodec mp2 rtp://224.0.1.2:1234
+ <br />ffplay rtp://224.0.1.2:1234
+</div>
+<!--l. 212--><p class="nopar" >
+</p>
+    
+</body> 
+</html>
+                                                                  
+
+

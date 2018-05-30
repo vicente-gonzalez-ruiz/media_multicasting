@@ -1,0 +1,212 @@
+\title{Media multicasting}
+
+\maketitle
+\tableofcontents
+
+Let's see some multicasing examples using VLC and FFMPEG.
+
+\section{Where are the video and audio devices?}
+The first input video device is \texttt{/dev/video0}, the second one
+\texttt{/dev/video1} and so on.
+
+Under ALSA there is not devices that you can see in the filesystem. To
+known which are the input audio devices, you can write:
+\begin{verbatim}
+arecord -l
+\end{verbatim}
+The output could be something like:
+\begin{verbatim}
+**** List of CAPTURE Hardware Devices ****
+card 0: NVidia [HDA NVidia], device 0: ALC889A Analog [ALC889A Analog]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: NVidia [HDA NVidia], device 1: ALC889A Digital [ALC889A Digital]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: NVidia [HDA NVidia], device 2: ALC889A Analog [ALC889A Analog]
+  Subdevices: 2/2
+  Subdevice #0: subdevice #0
+  Subdevice #1: subdevice #1
+card 1: default [Camera         ], device 0: USB Audio [USB Audio]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+\end{verbatim}
+
+\section{VLC}
+
+Go to:
+\begin{enumerate}
+\item Go to \texttt{Media}.
+\item Select \texttt{Streaming...}.
+\item Select \texttt{Capture Device}.
+\item Select \texttt{Video for Linux 2}.
+\item The video device name is \texttt{/dev/video0} if you have only
+  one camera attached to your computer. If you have more than one, try
+\begin{verbatim}
+ffplay -f video4linux2 /dev/video0
+\end{verbatim}
+to test if the device is whose that you want to use.
+The audio device name is \texttt{plughw:default}.
+\item Push on \texttt{Stream}.
+\item Now, VLC confirm your video source, that should be
+  \texttt{v4l2:///dev/video0}. Pusn on \texttt{Next}.
+\item Enable \texttt{Display locally} if you want to see your emision.
+\item Chose \texttt{RTP / MPEG Transport Stream} instead of
+  \texttt{File}. Next. push \texttt{Add}.
+\item In the \texttt{RTP/TS} section, write a multicast address
+  (\texttt{224.0.0.1} for example; remember that the multicast address
+  range is from \texttt{224.0.0.1} to
+  \texttt{239.255.255.255}). Select also a port (an integer between
+  1024 an 65335).
+\item Transcoding should be activated (\texttt{Video - H.264 + AAC
+    (MP4)}).
+\item Push on \texttt{Stream}.
+\end{enumerate}
+
+\section{FFMPEG}
+
+\subsection{Listing formats}
+\begin{verbatim}
+ffmpeg -formats
+\end{verbatim}
+
+\subsection{Listing codecs}
+\begin{verbatim}
+ffmpeg -codecs
+\end{verbatim}
+
+\subsection{Only visualizing}
+\begin{verbatim}
+ffplay -f video4linux2 /dev/video0
+ffplay -s 320x240 -f video4linux2 /dev/video0
+ffplay -s 640x480 -f video4linux2 /d-vcodec mpeg4 -f alsa -ac 2 -i pulse -acodec mp2 rtp://224.0.1.2:1234
+ev/video0
+\end{verbatim}
+
+\subsection{Capturing}
+\begin{verbatim}
+# Capturing time: 10 seconds
+# Frame rate: 30 frames/second
+# Container: OGG
+ffmpeg -t 10 -f video4linux2 -s 320x240 -r 30 -i /dev/video0 -f ogg /tmp/1.ogg
+
+ffmpeg -y -t 10 -f video4linux2 -s 320x240 -r 30 -i /dev/video0 -f ogg
+-f alsa -ac 2 -i hw:0,0 -acodec libvorbis /tmp/1.ogg
+
+ffmpeg -y -t 10 -f video4linux2 -s 320x240 -r 30 -i /dev/video0 -f
+x264 -f alsa -ac 2 -i pulse -acodec mp2 /tmp/1.mp4
+
+ffmpeg -y -t 10 -f video4linux2 -s 320x240 -r 30 -i /dev/video0 -f mp4 -vcodec mpeg4 -b 350k /tmp/1.mp4
+
+ffmpeg -r 15 -s 352x288 -f video4linux2 -i /dev/video0 -f mpegts
+-vcodec mpeg4 udp://224.0.1.2:1234
+mplayer udp://224.0.1.2:1234
+
+ffmpeg -r 15 -s 352x288 -f video4linux2 -i /dev/video0 -f mpegts
+-vcodec mpeg4 rtp://224.0.1.2:1234
+ffplay rtp://224.0.1.2:1234
+
+
+\end{verbatim}
+
+\subsection{Multiple unicast streaming}
+\begin{verbatim}
+cat > ffserver.conf << EOF
+Port 8090 
+# bind to all IPs aliased or not 
+BindAddress 0.0.0.0 
+# max number of simultaneous clients 
+MaxClients 1000 
+# max bandwidth per-client (kb/s) 
+MaxBandwidth 10000 
+# Suppress that if you want to launch ffserver as a daemon. 
+NoDaemon 
+
+<Feed feed1.ffm> 
+File /tmp/feed1.ffm 
+FileMaxSize 5M 
+</Feed> 
+
+# FLV output - good for streaming 
+<Stream test.flv> 
+# the source feed 
+Feed feed1.ffm 
+# the output stream format - FLV = FLash Video 
+Format flv 
+VideoCodec flv 
+# this must match the ffmpeg -r argument 
+VideoFrameRate 15 
+# generally leave this is a large number 
+VideoBufferSize 80000 
+# another quality tweak 
+VideoBitRate 200 
+# quality ranges - 1-31 (1 = best, 31 = worst) 
+VideoQMin 1 
+VideoQMax 5 
+VideoSize 352x288 
+# this sets how many seconds in past to start 
+PreRoll 0 
+# wecams don't have audio 
+Noaudio 
+</Stream> 
+
+# ASF output - for windows media player 
+<Stream test.asf> 
+# the source feed 
+Feed feed1.ffm 
+# the output stream format - ASF 
+Format asf 
+VideoCodec msmpeg4 
+# this must match the ffmpeg -r argument 
+VideoFrameRate 15 
+# generally leave this is a large number 
+VideoBufferSize 80000 
+# another quality tweak 
+VideoBitRate 200 
+# quality ranges - 1-31 (1 = best, 31 = worst) 
+VideoQMin 1 
+VideoQMax 5 
+VideoSize 352x288 
+# this sets how many seconds in past to start 
+PreRoll 0 
+# wecams don't have audio 
+Noaudio 
+</Stream>
+
+##################################################################
+# SDP/multicast examples
+#
+# If you want to send your stream in multicast, you must set the
+# multicast address with MulticastAddress. The port and the TTL can
+# also be set.
+#
+# An SDP file is automatically generated by ffserver by adding the
+# 'sdp' extension to the stream name (here
+# http://localhost:8090/test1-sdp.sdp). You should usually give this
+# file to your player to play the stream.
+#
+# The 'NoLoop' option can be used to avoid looping when the stream is
+# terminated.
+<Stream test1-sdp.mpg>
+Format rtp
+Feed feed1.ffm 
+#File "/usr/local/httpd/htdocs/test1.mpg"
+MulticastAddress 224.124.0.1
+MulticastPort 5000
+MulticastTTL 16
+NoLoop
+</Stream>
+EOF
+
+ffserver -d ./ffserver.conf
+
+ffmpeg -r 15 -s 352x288 -f video4linux2 -i /dev/video0 http://localhost:8090/feed1.ffm
+
+mplayer http://localhost:8090/test.asf
+\end{verbatim}
+
+\subsection{Multicast streaming}
+\begin{verbatim}
+ffmpeg -r 15 -s 352x288 -f video4linux2 -i /dev/video0 -f mpegts -vcodec mpeg4 -f alsa -ac 2 -i pulse -acodec mp2 rtp://224.0.1.2:1234
+ffplay rtp://224.0.1.2:1234
+\end{verbatim}
